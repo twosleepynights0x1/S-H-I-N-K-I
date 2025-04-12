@@ -1,0 +1,52 @@
+{
+
+    "roles": {
+      "moderation": {
+        "MuteChatRole": 597376894039490592,
+        "MuteGlobalRole": 597376775713980482,
+        "MuteVoiceRole": 597376651764170752
+      },
+
+
+      "administration": {
+        "AdminRoles": [597290400473939998, 821839784607612949]
+      }
+    },
+
+    "scrims": {
+      "ScrimVoiceCategory": 1352446041655345225,
+      "EventMakerRole": 652889442524069898,
+      "CapitanRole": 1072598159894782184,
+      "ScrimMemberRole": 1131334572051808296
+    },
+
+
+    "channels": {
+      "logs": {
+        "RoleLogChannel": 1352243871828017233,
+        "CommandsLogChannel": 1351301603268890755,
+        "MuteLogChannel": 1351301855430447207,
+        "WarnLogChannel": 1352646507693867078,
+        "JoinLeaveLogChannel": 1352294720981958797,
+        "MessageDelLogChannel": 1353785834301558864,
+        "ScrimRegChannel": 1353536521021554698
+      }
+    },
+
+    
+    "server": {
+      "ServerID": 471826594034352129
+    },
+
+
+    "season": {
+      "RankedRoles": [
+      675575840117096481,  
+      674341334848503809, 
+      672804559881633795,  
+      672804677573935124,  
+      672804650252238848,  
+      598964250052001874,  
+      598963412218675232]
+    }
+  }

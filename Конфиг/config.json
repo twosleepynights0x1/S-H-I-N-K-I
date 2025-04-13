@@ -24,6 +24,7 @@
     "channels": {
       "logs": {
         "RoleLogChannel": 1352243871828017233,
+        "RecoveryLogChannel": 1361072837300846642,
         "CommandsLogChannel": 1351301603268890755,
         "MuteLogChannel": 1351301855430447207,
         "WarnLogChannel": 1352646507693867078,

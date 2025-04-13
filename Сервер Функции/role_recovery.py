@@ -16,7 +16,7 @@ class RoleTracker(commands.Cog):
                 config = json.load(config_file)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             raise Exception(f"Не удалось загрузить конфигурацию из {CONFIG_PATH}: {e}")
-        self.role_log_channel_id = config["channels"]["logs"]["RoleLogChannel"]
+        self.role_log_channel_id = config["channels"]["logs"]["RecoveryLogChannel"]
         self.admin_roles = config["roles"]["administration"]["AdminRoles"]
         self.mute_roles = [
             config["roles"]["moderation"]["MuteChatRole"],

@@ -690,8 +690,6 @@ class ScrimsPanel(commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        if not any(role.id == self.event_maker_role_id or role.permissions.administrator for role in inter.author.roles):
-            return await inter.response.send_message("Недостаточно прав!", ephemeral=True)
         custom_id = inter.component.custom_id
         if custom_id == "open_reg":
             self.set_trios_status(True)
@@ -739,23 +737,8 @@ class ScrimsPanel(commands.Cog):
 
     @commands.Cog.listener()
     async def on_dropdown(self, inter: disnake.MessageInteraction):
-        if not any(role.id == self.event_maker_role_id or role.permissions.administrator for role in inter.author.roles):
-            return await inter.response.send_message("Недостаточно прав!", ephemeral=True)
         custom_id = inter.component.custom_id
         if custom_id == "event_management":
-            has_permission = any(
-                role.id == self.event_maker_role_id or role.permissions.administrator
-                for role in inter.author.roles
-            )
-            if not has_permission:
-                embed = disnake.Embed(
-                    title="Ошибка",
-                    description="**У вас нет прав для управления мероприятиями!**",
-                    color=disnake.Color.from_rgb(250, 77, 252)
-                )
-                embed.set_image(url="https://media.discordapp.net/attachments/1305280051989708820/1322586271809409166/error.gif?ex=67d8e7b3&is=67d79633&hm=d288f557b4ebf2f47899e12e683a4ba810126b68261e161b17b1df1b7a43f422&=")
-                await inter.response.send_message(embed=embed, ephemeral=True)
-                return
             if "create_event" in inter.values:
                 await inter.response.send_modal(modal=EventModal())
                 return
@@ -891,19 +874,6 @@ class ScrimsPanel(commands.Cog):
 
     async def disband_team(self, inter: disnake.MessageInteraction, team_index: int):
         try:
-            has_permission = any(
-                role.id == self.event_maker_role_id or role.permissions.administrator
-                for role in inter.author.roles
-            )
-            if not has_permission:
-                embed = disnake.Embed(
-                    title="Ошибка",
-                    description="У вас нет прав для расформирования команды!",
-                    color=disnake.Color.from_rgb(250, 77, 252)
-                )
-                embed.set_image(url="https://media.discordapp.net/attachments/1305280051989708820/1322586271809409166/error.gif?ex=67dd84f3&is=67dc3373&hm=81cdd044adda52918b2c114aef585e65e5db0fa2c06590923aba500eee96aca7&=&width=1424&height=82")
-                await inter.response.send_message(embed=embed)
-                return
             await inter.response.defer()
             if not os.path.exists(self.data_file):
                 embed = disnake.Embed(

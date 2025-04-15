@@ -7,7 +7,7 @@ class ScrimRegistration(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.data_file = "data/scrim_reg.json"
-        self.allow_reg_file = "data/scrim_allow.json"
+        self.allow_reg_file = "data/trios_allow.json"
         config_path = os.path.join('conf', 'config.json')
         with open(config_path, 'r', encoding='utf-8') as config_file:
             config = json.load(config_file)
@@ -18,13 +18,27 @@ class ScrimRegistration(commands.Cog):
         os.makedirs(os.path.dirname(self.allow_reg_file), exist_ok=True)
 
     def is_registration_allowed(self):
+        # Проверяем, существует ли файл
         if not os.path.exists(self.allow_reg_file):
+            print(f"Файл {self.allow_reg_file} не существует, создаём новый с allow_registration=False")
             with open(self.allow_reg_file, "w", encoding="utf-8") as f:
                 json.dump({"allow_registration": False}, f, ensure_ascii=False)
             return False
-        with open(self.allow_reg_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return data.get("allow_registration", False)
+        
+        # Пытаемся прочитать файл
+        try:
+            with open(self.allow_reg_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            print(f"Содержимое {self.allow_reg_file}: {data}")
+            allow_registration = data.get("allow_registration", False)
+            print(f"Значение allow_registration: {allow_registration}")
+            return allow_registration
+        except json.JSONDecodeError as e:
+            print(f"Ошибка декодирования JSON в файле {self.allow_reg_file}: {e}")
+            return False
+        except Exception as e:
+            print(f"Ошибка при чтении файла {self.allow_reg_file}: {e}")
+            return False
 
     @commands.slash_command(name="scrim_reg", description="Зарегистрировать команду для скримов")
     async def scrim_reg(

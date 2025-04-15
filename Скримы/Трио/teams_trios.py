@@ -6,7 +6,7 @@ import os
 class ScrimTeams(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.data_file = "data/trios_reg.json"
+        self.data_file = "data/scrim_reg.json"
 
     @commands.slash_command(name="teams_trios", description="Показать список зарегистрированных команд")
     async def scrim_teams_trios(self, inter: disnake.ApplicationCommandInteraction):

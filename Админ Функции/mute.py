@@ -168,6 +168,14 @@ class Mute(commands.Cog):
             await inter.response.send_message(embed=embed, ephemeral=True)
             return
 
+        # Проверяем, если это войс-мут и участник находится в голосовом канале
+        if mute_type == "voice" and member.voice is not None:
+            try:
+                await member.move_to(None)  # Отключаем участника от голосового канала
+                print(f"Участник {member.name} был отключён от голосового канала при выдаче войс-мута.")
+            except Exception as e:
+                print(f"Ошибка при отключении участника {member.name} от голосового канала: {e}")
+
         await member.add_roles(mute_role)
         mute_time = datetime.datetime.utcnow()
         unmute_time = mute_time + time_timedelta

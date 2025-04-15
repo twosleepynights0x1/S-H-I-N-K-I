@@ -7,7 +7,7 @@ import os
 from datetime import datetime, timedelta
 
 TRIOS_ALLOW_PATH = Path("data/trios_allow.json")
-TRIOS_REG_PATH = Path("data/trios_reg.json")
+TRIOS_REG_PATH = Path("data/scrim_reg.json")
 EVENT_PATH = Path("data/event.json")
 VOICE_DATA_PATH = Path("data/trios_voice.json")
 SPOT_PICKER_PATH = Path("data/spot_picker_trio.json")
@@ -216,7 +216,7 @@ class SpotPickerModal(disnake.ui.Modal):
 class ScrimsPanel(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.data_file = "data/trios_reg.json"
+        self.data_file = "data/scrim_reg.json"
         self.voice_data_file = "data/trios_voice.json"
         self.spot_picker_file = "data/spot_picker_trio.json"
         CONFIG_PATH = os.path.join('conf', 'config.json')

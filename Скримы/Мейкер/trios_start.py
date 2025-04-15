@@ -6,7 +6,7 @@ import os
 class ScrimsStart(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.data_file = "data/trios_reg.json"
+        self.data_file = "data/scrim_reg.json"
         self.voice_data_file = "data/trios_voice.json"
         CONFIG_PATH = os.path.join('conf', 'config.json')
         try:

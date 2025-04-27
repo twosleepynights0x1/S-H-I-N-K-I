@@ -311,16 +311,12 @@ class ActivityTracker(commands.Cog):
         )
 
         embed = disnake.Embed(
-            title="Статистика участника",
+            title=f"Статистика участника - {member.display_name}",
             description=description,
             color=disnake.Color.from_rgb(250, 77, 252)
         )
         embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
         embed.set_image(url="https://media.discordapp.net/attachments/1305280051989708820/1365810764408950915/level.gif")
-        embed.set_footer(
-            text=f"Пользователь: {inter.user.display_name}",
-            icon_url=inter.user.avatar.url if inter.user.avatar else None
-        )
 
         await inter.edit_original_response(embed=embed)
 

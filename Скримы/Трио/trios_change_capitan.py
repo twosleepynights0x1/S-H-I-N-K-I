@@ -23,7 +23,7 @@ class ChangeCapitanTrios(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         new_captain: disnake.Member = commands.Param(description="Новый капитан команды")
     ):
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=True)
         if not os.path.exists(self.data_file):
             embed = disnake.Embed(
                 title="Ошибка",

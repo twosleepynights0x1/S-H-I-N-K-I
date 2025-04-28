@@ -24,7 +24,7 @@ class TriosChangeMember(commands.Cog):
         old_member: disnake.Member = commands.Param(description="Тиммейт, которого нужно заменить"),
         new_member: disnake.Member = commands.Param(description="Новый тиммейт")
     ):
-        await inter.response.defer()
+        await inter.response.defer(ephemeral=True)
         if not os.path.exists(self.data_file):
             embed = disnake.Embed(
                 title="Ошибка",

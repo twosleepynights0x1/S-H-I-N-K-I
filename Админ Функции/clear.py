@@ -53,7 +53,6 @@ class ClearMessages(commands.Cog):
         interaction: disnake.ApplicationCommandInteraction, 
         amount: int
     ):
-        
         await interaction.response.defer()
 
         if not any(role.id in self.allowed_roles for role in interaction.user.roles) and not interaction.user.guild_permissions.administrator:
@@ -61,7 +60,7 @@ class ClearMessages(commands.Cog):
                 title="Ошибка",
                 description=f"**У вас нет прав для использования этой команды ^^**",
                 color=disnake.Color.from_rgb(250, 77, 252))
-            embed.set_thumbnail(url=interaction.guild.me.avatar.url)  # Аватар бота справа сверху
+            embed.set_thumbnail(url=interaction.guild.me.avatar.url) 
             embed.set_image(url="https://media.discordapp.net/attachments/1305280051989708820/1322586271809409166/error.gif?ex=67d8e7b3&is=67d79633&hm=d288f557b4ebf2f47899e12e683a4ba810126b68261e161b17b1df1b7a43f422&=")
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
@@ -71,11 +70,11 @@ class ClearMessages(commands.Cog):
                 title="Ошибка",
                 description=f"**Количество сообщений должно быть от 1 до 100.**",
                 color=disnake.Color.from_rgb(250, 77, 252))
-            embed.set_thumbnail(url=interaction.guild.me.avatar.url)  # Аватар бота справа сверху
+            embed.set_thumbnail(url=interaction.guild.me.avatar.url)  
             embed.set_image(url="https://media.discordapp.net/attachments/1305280051989708820/1322586271809409166/error.gif?ex=67d8e7b3&is=67d79633&hm=d288f557b4ebf2f47899e12e683a4ba810126b68261e161b17b1df1b7a43f422&=")
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
-        
+
         deleted = await interaction.channel.purge(limit=amount)
 
         embed = disnake.Embed(
@@ -90,6 +89,7 @@ class ClearMessages(commands.Cog):
             icon_url=interaction.user.display_avatar.url
         )
         await interaction.followup.send(embed=embed)
+
         action = {
             "command": "clear",         
             "deleted_count": len(deleted) 

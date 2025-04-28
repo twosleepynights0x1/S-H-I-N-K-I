@@ -36,7 +36,7 @@ class ActivityTracker(commands.Cog):
         self.voice_join_times = {}
         self.max_level = 50
 
-        self.LEVEL_UP_CHANNEL_ID = 1351353917740679270
+        self.LEVEL_UP_CHANNEL_ID = 1078676627036307507
 
         self.VOICE_LEVEL_XP = {}
         for level in range(1, 11):
@@ -174,7 +174,7 @@ class ActivityTracker(commands.Cog):
             embed = disnake.Embed(
                 title="Повышение уровня ^^",
                 description=(
-                    f"Пользователь {member.mention}!"
+                    f"Пользователь {member.display_name}!\n"
                     f"Достиг **{new_level} уровня**\n"
                     f"Получена роль {role.mention}"
                 ),
@@ -184,7 +184,7 @@ class ActivityTracker(commands.Cog):
             embed = disnake.Embed(
                 title="Повышение уровня ^^",
                 description=(
-                    f"Пользователь {member.mention}!\n"
+                    f"Пользователь {member.display_name}!\n"
                     f"Достиг **{new_level} уровня**"
                 ),
                 color=disnake.Color.from_rgb(250, 77, 252)
@@ -194,7 +194,7 @@ class ActivityTracker(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar.url if self.bot.user.avatar else self.bot.user.default_avatar.url)
 
         try:
-            await channel.send(embed=embed)
+            await channel.send(content=member.mention, embed=embed)
         except Exception as e:
             print(f"[send_level_up_message] Ошибка при отправке сообщения о повышении уровня для {member.id}: {e}", flush=True)
 
@@ -281,7 +281,7 @@ class ActivityTracker(commands.Cog):
                 del self.voice_join_times[user_id]
 
     @commands.slash_command(description="Показать уровень участника")
-    async def test_level(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member = None):
+    async def level(self, inter: disnake.ApplicationCommandInteraction, member: disnake.Member = None):
         await inter.response.defer()
         
         member = member or inter.author
@@ -321,7 +321,7 @@ class ActivityTracker(commands.Cog):
         await inter.edit_original_response(embed=embed)
 
     @commands.slash_command(description="Показать лидерборд по активности")
-    async def test_leaderboard(
+    async def leaderboard(
         self,
         inter: disnake.ApplicationCommandInteraction,
         category: str = commands.Param(

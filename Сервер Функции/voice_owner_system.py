@@ -4,6 +4,7 @@ import json
 import os
 import stat
 import traceback
+import asyncio
 
 class VoiceManager(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -12,6 +13,7 @@ class VoiceManager(commands.Cog):
         project_root = os.path.dirname(module_dir)
         self.voice_owners_file = os.path.join(project_root, "data", "voice_owners.json")
         self.log_channel_id = 1366185256075530291 
+        self.kick_log_channel_id = 1366418566630346813  # Новый канал для логов кика
         self.excluded_channels = {
             597379133852352513,
             1364302960166961194,
@@ -64,6 +66,16 @@ class VoiceManager(commands.Cog):
             print(f"[VoiceManager save_voice_owners] Ошибка при сохранении владельцев голосовых каналов в {self.voice_owners_file}: {e}", flush=True)
             traceback.print_exc()
             raise
+
+    async def restrict_channel_access(self, member: disnake.Member, voice_channel: disnake.VoiceChannel):
+        try:
+            await voice_channel.set_permissions(member, connect=False)
+            await asyncio.sleep(600)  # 10 минут
+            await voice_channel.set_permissions(member, connect=None)
+        except disnake.Forbidden:
+            print(f"[VoiceManager restrict_channel_access] Нет прав для изменения разрешений канала {voice_channel.name} для {member.display_name}", flush=True)
+        except Exception as e:
+            print(f"[VoiceManager restrict_channel_access] Ошибка при ограничении доступа к каналу: {e}", flush=True)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: disnake.Member, before: disnake.VoiceState, after: disnake.VoiceState):
@@ -307,16 +319,41 @@ class VoiceManager(commands.Cog):
             )
             await inter.edit_original_response(embed=embed)
 
-            embed = disnake.Embed(
-                title="Участник кикнут",
-                description=f"{member.display_name} был кикнут из канала владельцем {inter.author.display_name}!",
+            # Отправка сообщения кикнутому участнику в DM
+            dm_embed = disnake.Embed(
+                title="Вы были кикнуты",
+                description=f"Вы были кикнуты из канала **{author_voice.channel.name}** владельцем {inter.author.display_name}!\nДоступ к каналу закрыт на 10 минут.",
                 color=disnake.Color.from_rgb(250, 77, 252)
             )
-            embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            dm_embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
             try:
-                await author_voice.channel.send(embed=embed)
-            except Exception as e:
-                print(f"[VoiceManager voice_kick] Ошибка при отправке сообщения о кике: {e}", flush=True)
+                await member.send(embed=dm_embed)
+            except disnake.Forbidden:
+                print(f"[VoiceManager voice_kick] Не удалось отправить сообщение {member.display_name} в DM: доступ закрыт", flush=True)
+
+            # Ограничение доступа к каналу
+            self.bot.loop.create_task(self.restrict_channel_access(member, author_voice.channel))
+
+            # Отправка лога в канал 1366418566630346813
+            kick_log_channel = self.bot.get_channel(self.kick_log_channel_id)
+            if kick_log_channel:
+                current_members = author_voice.channel.members
+                members_list = "\n".join([f"{m.mention}" for m in current_members]) if current_members else "Нет участников."
+                log_embed = disnake.Embed(
+                    title="Участник кикнут из голосового канала",
+                    description=(
+                        f"Владелец канала: {inter.author.mention}\n"
+                        f"Кикнутый участник: {member.mention}\n"
+                        f"Доступ к каналу {author_voice.channel.mention} заблокирован для участника на 10 минут.\n\n"
+                        f"**Текущие участники канала:**\n{members_list}"
+                    ),
+                    color=disnake.Color.from_rgb(250, 77, 252)
+                )
+                log_embed.set_thumbnail(url=inter.author.avatar.url if inter.author.avatar else inter.author.default_avatar.url)
+                try:
+                    await kick_log_channel.send(embed=log_embed)
+                except Exception as e:
+                    print(f"[VoiceManager voice_kick] Ошибка при отправке лога кика в канал {self.kick_log_channel_id}: {e}", flush=True)
 
         except disnake.Forbidden:
             embed = disnake.Embed(
@@ -446,13 +483,42 @@ class VoiceManager(commands.Cog):
 
             try:
                 await member_to_kick.edit(voice_channel=None)
-                kick_embed = disnake.Embed(
-                    title="Участник кикнут",
-                    description=f"{member_to_kick.display_name} был кикнут из канала владельцем {inter.author.display_name}!",
+
+                # Отправка сообщения кикнутому участнику в DM
+                dm_embed = disnake.Embed(
+                    title="Вы были кикнуты",
+                    description=f"Вы были кикнуты из канала **{voice_channel.name}** владельцем {inter.author.display_name}!\nДоступ к каналу закрыт на 10 минут.",
                     color=disnake.Color.from_rgb(250, 77, 252)
                 )
-                kick_embed.set_thumbnail(url=member_to_kick.avatar.url if member_to_kick.avatar else member_to_kick.default_avatar.url)
-                await voice_channel.send(embed=kick_embed)
+                dm_embed.set_thumbnail(url=member_to_kick.avatar.url if member_to_kick.avatar else member_to_kick.default_avatar.url)
+                try:
+                    await member_to_kick.send(embed=dm_embed)
+                except disnake.Forbidden:
+                    print(f"[VoiceManager voice_panel] Не удалось отправить сообщение {member_to_kick.display_name} в DM: доступ закрыт", flush=True)
+
+                # Ограничение доступа к каналу
+                self.bot.loop.create_task(self.restrict_channel_access(member_to_kick, voice_channel))
+
+                # Отправка лога в канал 1366418566630346813
+                kick_log_channel = self.bot.get_channel(self.kick_log_channel_id)
+                if kick_log_channel:
+                    current_members = voice_channel.members
+                    members_list = "\n".join([f"{m.mention}" for m in current_members]) if current_members else "Нет участников."
+                    log_embed = disnake.Embed(
+                        title="Участник кикнут из голосового канала",
+                        description=(
+                            f"Владелец канала: {inter.author.mention}\n"
+                            f"Кикнутый участник: {member_to_kick.mention}\n"
+                            f"Доступ к каналу {voice_channel.mention} заблокирован для участника на 10 минут.\n\n"
+                            f"**Текущие участники канала:**\n{members_list}"
+                        ),
+                        color=disnake.Color.from_rgb(250, 77, 252)
+                    )
+                    log_embed.set_thumbnail(url=inter.author.avatar.url if inter.author.avatar else inter.author.default_avatar.url)
+                    try:
+                        await kick_log_channel.send(embed=log_embed)
+                    except Exception as e:
+                        print(f"[VoiceManager voice_panel] Ошибка при отправке лога кика в канал {self.kick_log_channel_id}: {e}", flush=True)
 
                 updated_members = voice_channel.members
                 updated_members_list = "\n".join([f"- {m.display_name}" for m in updated_members]) if updated_members else "Нет участников."
